@@ -45,19 +45,8 @@
 
 ---
 
-## 🔥 Highlights
-
-* Plug-and-play training framework (no inference overhead)
-* Frequency-aligned self-distillation (LF vs HF disentanglement)
-* Works across U-Net and DiT backbones
-* Improves both fidelity (PSNR/SSIM) and perceptual quality (LPIPS, NIQE, MANIQA, MUSIQ)
-
----
-
 ## 📑 Table of Contents
 
-- [🔥 Highlights](#-highlights)
-- [📑 Table of Contents](#-table-of-contents)
 - [📧 News](#-news)
 - [📖 Abstract](#-abstract)
 - [🖼️ Method Overview](#️-method-overview)
