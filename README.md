@@ -43,35 +43,64 @@
     </p>
 </div>
 
+---
+
+## 🔥 Highlights
+
+* Plug-and-play training framework (no inference overhead)
+* Frequency-aligned self-distillation (LF vs HF disentanglement)
+* Works across U-Net and DiT backbones
+* Improves both fidelity (PSNR/SSIM) and perceptual quality (LPIPS, NIQE, MANIQA, MUSIQ)
+
+---
+
 ## 📑 Table of Contents
-- [� Table of Contents](#-table-of-contents)
+
+- [🔥 Highlights](#-highlights)
+- [📑 Table of Contents](#-table-of-contents)
 - [📧 News](#-news)
 - [📖 Abstract](#-abstract)
 - [🖼️ Method Overview](#️-method-overview)
+  - [💡 Intuition](#-intuition)
+  - [⚙️ Key Components](#️-key-components)
 - [🔧 Dependencies and Installation](#-dependencies-and-installation)
 - [🚀 Get Started](#-get-started)
   - [Training](#training)
     - [Download Checkpoints](#download-checkpoints)
     - [Download Train Datasets](#download-train-datasets)
-    - [Strat Train](#strat-train)
+    - [Start Train](#start-train)
   - [Testing](#testing)
+- [🖼️ Large Image Inference Tips](#️-large-image-inference-tips)
+  - [🔧 Key Arguments](#-key-arguments)
+  - [💡 Guidelines](#-guidelines)
+  - [⚡ Memory-Efficient](#-memory-efficient)
+  - [🚀 High-Quality](#-high-quality)
 - [📊 Qualitative Results](#-qualitative-results)
+- [📦 Release Checklist](#-release-checklist)
 - [🙏 Acknowledgements](#-acknowledgements)
 - [📜 License](#-license)
 - [📝 Citation](#-citation)
 - [⭐ Star History](#-star-history)
 
+---
+
 ## 📧 News
-- **Feb 21, 2026:** FRAMER accepted to CVPR 2026 🥳
-- **Dec 08, 2025:** This repository is created.
-- **Dec 08, 2025:** The paper is available on [arXiv](https://arxiv.org/abs/2512.01390).
+
+* **Feb 21, 2026:** FRAMER accepted to CVPR 2026 🥳
+* **Dec 08, 2025:** Repository created.
+* **Dec 08, 2025:** Paper available on [arXiv](https://arxiv.org/abs/2512.01390).
+
+---
 
 ## 📖 Abstract
+
 Real-image super-resolution (Real-ISR) seeks to recover HR images from LR inputs with mixed, unknown degradations. While diffusion models surpass GANs in perceptual quality, they often under-reconstruct high-frequency (HF) details due to a **low-frequency (LF) bias** and a depth-wise **"low-first, high-later" hierarchy**.
 
 We introduce **FRAMER**, a plug-and-play training scheme that exploits diffusion priors without changing the backbone or inference. At each denoising step, the final-layer feature map teaches all intermediate layers. Teacher and student feature maps are decomposed into LF/HF bands via FFT masks to align supervision with the model's internal frequency hierarchy.
 
 For LF, an **Intra Contrastive Loss (IntraCL)** stabilizes globally shared structure. For HF, an **Inter Contrastive Loss (InterCL)** sharpens instance-specific details using random-layer and in-batch negatives. Two adaptive modulators, **Frequency-based Adaptive Weight (FAW)** and **Frequency-based Alignment Modulation (FAM)**, reweight per-layer LF/HF signals and gate distillation by current similarity. Across U-Net and DiT backbones, FRAMER consistently improves PSNR/SSIM and perceptual metrics (LPIPS, NIQE, MANIQA, MUSIQ).
+
+---
 
 ## 🖼️ Method Overview
 
@@ -81,17 +110,27 @@ FRAMER is a training-only framework that adds auxiliary loss components. It deco
     <img src="assets/framework.png" alt="Architecture" width="95%">
 </div>
 
-**Key Components:**
-1.  **IntraCL (Low-Frequency):** Stabilizes shared structures by comparing students only against the teacher and same-image random layers (no in-batch negatives).
-2.  **InterCL (High-Frequency):** Sharpens details using both random-layer negatives and in-batch negatives to encourage instance discrimination.
-3.  **FAW (Adaptive Weight):** Reweights distillation based on the relative frequency difference to the final layer.
-4.  **FAM (Alignment Modulation):** Gates distillation strength based on student-teacher alignment to prevent early training collapse.
+### 💡 Intuition
+
+FRAMER improves diffusion-based SR by:
+1. Separating features into low/high frequencies.
+2. Teaching early layers using final-layer knowledge.
+3. Applying different contrastive strategies for structure vs detail.
+
+### ⚙️ Key Components
+
+1. **IntraCL (Low-Frequency):** Stabilizes shared structures by comparing students only against the teacher and same-image random layers (no in-batch negatives).
+2. **InterCL (High-Frequency):** Sharpens details using both random-layer negatives and in-batch negatives to encourage instance discrimination.
+3. **FAW (Adaptive Weight):** Reweights distillation based on the relative frequency difference to the final layer.
+4. **FAM (Alignment Modulation):** Gates distillation strength based on student-teacher alignment to prevent early training collapse.
+
+---
 
 ## 🔧 Dependencies and Installation
 
 1. Clone repo
     ```bash
-    git clone https://github.com/CMLab-Korea/FRAMER-arxiv.git
+    git clone [https://github.com/CMLab-Korea/FRAMER-arxiv.git](https://github.com/CMLab-Korea/FRAMER-arxiv.git)
     cd FRAMER-arxiv
     ```
 
@@ -100,28 +139,28 @@ FRAMER is a training-only framework that adds auxiliary loss components. It deco
     pip install -r requirements.txt
     ```
 
+---
+
 ## 🚀 Get Started
 
 This project is a fork of the official [DiT4SR](https://github.com/adam-duan/DiT4SR) repository. Consequently, the core architecture, as well as the protocols for training and testing, strictly follow the methodologies and scripts provided in the original implementation.
 
 ### Training
 
-
 #### Download Checkpoints
 
-- Download the [stable-diffusion-3.5-medium](https://huggingface.co/stabilityai/stable-diffusion-3.5-medium) checkpoints.
-- Download the [clip-vit-large-patch14-336](https://huggingface.co/openai/clip-vit-large-patch14-336) and [
-llava-v1.5-13b](https://huggingface.co/liuhaotian/llava-v1.5-13b) and update CKPT_PTH.py to include the local directory paths for the downloaded clip-vit-large-patch14-336 and llava-v1.5-13b models.
+* Download the [stable-diffusion-3.5-medium](https://huggingface.co/stabilityai/stable-diffusion-3.5-medium) checkpoints.
+* Download the [clip-vit-large-patch14-336](https://huggingface.co/openai/clip-vit-large-patch14-336) and [llava-v1.5-13b](https://huggingface.co/liuhaotian/llava-v1.5-13b) and update `CKPT_PTH.py` to include the local directory paths for the downloaded clip-vit-large-patch14-336 and llava-v1.5-13b models.
 
 #### Download Train Datasets
-- Download the training datasets including `DIV2K`, `DIV8K`, `Flickr2K`, `Flickr8K`, and `NKUSR8K` dataset.
 
-- The data preparation process including LR-HR pair generation, prompt synthesis, and the extraction of latent codes and prompt embeddings is executed via the provided shell scripts in bash_data/.
-    - Following [DiT4SR](https://github.com/adam-duan/DiT4SR), you can generate the LR-HR pairs for training using `bash_data/make_pairs.sh`.
-    - Prompt Generation: Run `bash_data/make_prompt.sh` to synthesize prompts for HR images.
-    - Latent Encoding: Execute `bash_data/make_latent.sh` to extract latent codes for HR and LR pairs.
-    - Text Embedding: Use `bash_data/make_embedding.sh` to generate embeddings for the synthesized prompts.
-- Data Structure After Preprocessing
+* Download the training datasets including `DIV2K`, `DIV8K`, `Flickr2K`, `Flickr8K`, and `NKUSR8K` dataset.
+* The data preparation process including LR-HR pair generation, prompt synthesis, and the extraction of latent codes and prompt embeddings is executed via the provided shell scripts in `bash_data/`.
+    * Following [DiT4SR](https://github.com/adam-duan/DiT4SR), you can generate the LR-HR pairs for training using `bash_data/make_pairs.sh`.
+    * Prompt Generation: Run `bash_data/make_prompt.sh` to synthesize prompts for HR images.
+    * Latent Encoding: Execute `bash_data/make_latent.sh` to extract latent codes for HR and LR pairs.
+    * Text Embedding: Use `bash_data/make_embedding.sh` to generate embeddings for the synthesized prompts.
+* Data Structure After Preprocessing:
 
     ```python
     preset/datasets/training_datasets/ 
@@ -148,13 +187,16 @@ llava-v1.5-13b](https://huggingface.co/liuhaotian/llava-v1.5-13b) and update CKP
             └── ...
     ```
 
-#### Strat Train
-Use the following command to start the training process:
+#### Start Train
+
+Use the following command to start the training process.
 
 If you want to get started quickly:
 ```bash
 bash bash/train.sh
-```
+````
+
+For detailed configuration:
 
 ```bash
 accelerate launch --config_file multi-gpu.yaml train/train_dit4sr.py \
@@ -172,7 +214,7 @@ accelerate launch --config_file multi-gpu.yaml train/train_dit4sr.py \
 
 ### Testing
 
-- Place test images in preset/datasets/test_datasets/.
+  * Place test images in `preset/datasets/test_datasets/`.
 
     ```bash
     # test w/o llava, one GPU is enough
@@ -189,11 +231,59 @@ accelerate launch --config_file multi-gpu.yaml train/train_dit4sr.py \
     --image_path="YOUR_TEST_DATASETS_PATH" \
     --output_dir="results/" \
     ```
-- The processed results will be saved in the output_dir directory.
 
-- The saved results can be evaluated using [pyiqa](https://github.com/chaofengc/IQA-PyTorch/tree/main) to compute PSNR, SSIM, LPIPS, NIQE, MANIQA, and MUSIQ metrics.
+  * The processed results will be saved in the `output_dir` directory.
 
-- If you want to use a pretrained model, please download it from the link provided above.
+  * The saved results can be evaluated using [pyiqa](https://github.com/chaofengc/IQA-PyTorch/tree/main) to compute PSNR, SSIM, LPIPS, NIQE, MANIQA, and MUSIQ metrics.
+
+  * If you want to use a pretrained model, please download it from the link provided above.
+
+-----
+
+## 🖼️ Large Image Inference Tips
+
+When processing high-resolution images, GPU memory can be a bottleneck.
+
+### 🔧 Key Arguments
+
+  * `--process_size`: base resolution (↓ memory, ↓ quality)
+  * `--latent_tiled_size`: tile size (↓ memory, ↓ speed)
+  * `--latent_tiled_overlap`: boundary smoothing
+  * `--vae_encoder_tiled_size`: reduce if OOM
+  * `--vae_decoder_tiled_size`: reduce for large outputs
+
+### 💡 Guidelines
+
+**OOM**
+
+  * Reduce `process_size`
+  * Reduce `latent_tiled_size`
+  * Reduce `vae_encoder_tiled_size`
+
+**High Quality**
+
+  * Increase `process_size`
+  * Increase overlap
+
+### ⚡ Memory-Efficient
+
+```bash
+python test/test_wllava.py \
+    --process_size 512 \
+    --latent_tiled_size 32 \
+    --latent_tiled_overlap 16
+```
+
+### 🚀 High-Quality
+
+```bash
+python test/test_wllava.py \
+    --process_size 768 \
+    --latent_tiled_size 64 \
+    --latent_tiled_overlap 32
+```
+
+-----
 
 ## 📊 Qualitative Results
 
@@ -204,6 +294,17 @@ accelerate launch --config_file multi-gpu.yaml train/train_dit4sr.py \
 <div align="center">
     <img src="assets/qualitative2.png" width="95%">
 </div>
+
+-----
+
+## 📦 Release Checklist
+
+  * [x] FRAMER-D code released
+  * [ ] FRAMER-U code (coming soon)
+  * [ ] FRAMER-D pretrained model (coming soon)
+  * [ ] FRAMER-U pretrained model (coming soon)
+
+-----
 
 ## 🙏 Acknowledgements
 
